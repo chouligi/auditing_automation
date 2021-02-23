@@ -5,7 +5,5 @@ auditing_automation.egg-info/
 dist/
 venv/
 
-auditing_automation/__pycache__/
-tests/__pycache__/
-
 *.egginfo/
+__pycache__/
