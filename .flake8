@@ -7,4 +7,4 @@ show-source: False
 # Maximum cyclomatic complexity allowed
 max-complexity: 14
 # format: pep8
-exclude: .git,.idea
+exclude: .git,.idea, leadsheet_generator.py
