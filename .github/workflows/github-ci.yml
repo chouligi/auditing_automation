@@ -42,7 +42,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Dependencies
-        run: sudo pip3 install -r requirements.txt
+        run: sudo -H pip3 install -r requirements.txt
 
       - name: Run Pytest
         run: pytest
