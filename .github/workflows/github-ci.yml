@@ -50,6 +50,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Install setuptools
+        run: sudo pip3 install setuptools
+
       - name: Install xlwings on linux
         run: export INSTALL_ON_LINUX=1; pip install xlwings
 
