@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install xlwings on linux
-      run: export INSTALL_ON_LINUX=1; pip install xlwings
+        run: export INSTALL_ON_LINUX=1; pip install xlwings
 
       - name: Install Dependencies
         run: sudo -H pip3 install -r requirements.txt
