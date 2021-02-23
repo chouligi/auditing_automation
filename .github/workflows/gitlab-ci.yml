@@ -40,3 +40,9 @@ jobs:
           checkName: 'flake8'   # NOTE: this needs to be the same as the job name
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Pytest
+        run: sudo pip3 install pytest
+
+      - name: Run Pytest
+        run: pytest
