@@ -41,8 +41,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Pytest
-        run: sudo pip3 install pytest
+      - name: Install Dependencies
+        run: sudo pip3 install -r requirements.txt
 
       - name: Run Pytest
         run: pytest
