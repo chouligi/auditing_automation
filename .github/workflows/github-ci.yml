@@ -48,4 +48,4 @@ jobs:
         run: sudo -H pip3 install -r requirements.txt
 
       - name: Run Pytest
-        run: pytest
+        run: python3 -m pytest
