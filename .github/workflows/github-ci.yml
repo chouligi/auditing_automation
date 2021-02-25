@@ -43,7 +43,7 @@ jobs:
 
   pytest:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -53,8 +53,8 @@ jobs:
       - name: Install setuptools
         run: sudo pip3 install setuptools
 
-      - name: Install xlwings on linux
-        run: export INSTALL_ON_LINUX=1; pip3 install xlwings
+      #- name: Install xlwings on linux
+      #  run: export INSTALL_ON_LINUX=1; pip3 install xlwings
 
       - name: Install Dependencies
         run: sudo -H pip3 install -r requirements.txt

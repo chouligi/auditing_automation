@@ -2,4 +2,4 @@ openpyxl
 pandas
 pytest
 psutil
-appscript
+xlwings
