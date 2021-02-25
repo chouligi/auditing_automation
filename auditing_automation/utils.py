@@ -39,8 +39,9 @@ def create_new_workbook(output_path: str):
 
     # workbook_to_copy = xw.Book(WORKBOOK_TO_COPY_PATH)
     # sheet_to_copy = workbook_to_copy.sheets[SHEET_TO_COPY_NAME]
+    new_workbook = xw.Book()
 
-    return
+    new_workbook.save(f"{output_path}-leadsheet.xlsx")
 
 
 def create_workbook_based_on_template():

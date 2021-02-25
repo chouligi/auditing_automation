@@ -9,6 +9,7 @@ import pandas as pd
 from openpyxl.workbook.workbook import Workbook
 import types
 import xlwings as xw
+import os
 
 
 def test_load_xl_workbook_is_openpyxl_workbookw(test_workbook):
@@ -70,4 +71,6 @@ def test_copy_sheet_in_same_workbook(test_workbook):
 
 
 def test_create_new_workbook():
-    create_new_workbook(output_path='none')
+    test_name = 'test'
+    create_new_workbook(output_path=test_name)
+    os.remove(f'{test_name}-leadsheet.xlsx')
