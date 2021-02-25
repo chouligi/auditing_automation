@@ -1,6 +1,11 @@
 import openpyxl
 from openpyxl.workbook.workbook import Workbook
 from types import GeneratorType
+import os
+import xlwings as xw
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(THIS_DIR, 'data')
 
 
 def load_xl_workbook(path: str) -> Workbook:
@@ -15,8 +20,26 @@ def get_columns(data: GeneratorType) -> str:
     return next(data)[0:]
 
 
+def copy_sheet_in_same_workbook(workbook_path: str, sheet_to_copy_name: str, name_of_new_sheet: str):
+    workbook_to_copy = xw.Book(workbook_path)
+    sheet_to_copy = workbook_to_copy.sheets[sheet_to_copy_name]
+
+    # copy within the same sheet
+    sheet_to_copy.api.copy_worksheet(after_=sheet_to_copy.api)
+
+    copied_sheet = workbook_to_copy.sheets[1]
+
+    copied_sheet.name = name_of_new_sheet
+
+
 def create_new_workbook(output_path: str):
     # Create a new workbook in the given path
+    # WORKBOOK_TO_COPY_PATH = os.path.join(DATA_DIR, 'workbook_to_copy.xlsx')
+    # SHEET_TO_COPY_NAME = 'Trial Balance'
+
+    # workbook_to_copy = xw.Book(WORKBOOK_TO_COPY_PATH)
+    # sheet_to_copy = workbook_to_copy.sheets[SHEET_TO_COPY_NAME]
+
     return
 
 

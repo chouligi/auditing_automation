@@ -1,7 +1,14 @@
-from auditing_automation.utils import load_xl_workbook, get_worksheet_values_from_workbook, get_columns
+from auditing_automation.utils import (
+    load_xl_workbook,
+    get_worksheet_values_from_workbook,
+    get_columns,
+    create_new_workbook,
+    copy_sheet_in_same_workbook,
+)
 import pandas as pd
 from openpyxl.workbook.workbook import Workbook
 import types
+import xlwings as xw
 
 
 def test_load_xl_workbook_is_openpyxl_workbookw(test_workbook):
@@ -32,5 +39,35 @@ def test_get_columns(test_workbook):
 
     columns = get_columns(worksheet_values)
     expected_output = (
-        'GL Acct', 'Name', 'PY 31.12.2019', 'CY 31.12.2020', 'Mapping', 'Subcategory', None, 'Input - Mapping')
+        'GL Acct',
+        'Name',
+        'PY 31.12.2019',
+        'CY 31.12.2020',
+        'Mapping',
+        'Subcategory',
+        None,
+        'Input - Mapping',
+    )
     assert columns == expected_output
+
+
+def test_copy_sheet_in_same_workbook(test_workbook):
+    sheet_to_copy_name = 'Trial Balance'
+    name_of_new_sheet = 'Copied Trial Balance'
+
+    copy_sheet_in_same_workbook(
+        workbook_path=test_workbook, sheet_to_copy_name=sheet_to_copy_name, name_of_new_sheet=name_of_new_sheet
+    )
+
+    workbook = xw.Book(test_workbook)
+
+    sheet_names = [sheet.name for sheet in workbook.sheets]
+    assert name_of_new_sheet in sheet_names
+
+    for sheet in workbook.sheets:
+        if sheet.name != sheet_to_copy_name:
+            sheet.delete()
+
+
+def test_create_new_workbook():
+    create_new_workbook(output_path='none')
