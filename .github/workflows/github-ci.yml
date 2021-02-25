@@ -41,23 +41,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  pytest:
-    # The type of runner that the job will run on
-    runs-on: macos-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      - name: Install setuptools
-        run: sudo pip3 install setuptools
-
-      #- name: Install xlwings on linux
-      #  run: export INSTALL_ON_LINUX=1; pip3 install xlwings
-
-      - name: Install Dependencies
-        run: sudo -H pip3 install -r requirements.txt
-
-      - name: Run Pytest
-        run: python3 -m pytest
+  #pytest:
+  #  # The type of runner that the job will run on
+  #  runs-on: macos-latest
+#
+  #  # Steps represent a sequence of tasks that will be executed as part of the job
+  #  steps:
+  #    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+  #    - uses: actions/checkout@v2
+#
+  #    - name: Install setuptools
+  #      run: sudo pip3 install setuptools
+#
+  #    #- name: Install xlwings on linux
+  #    #  run: export INSTALL_ON_LINUX=1; pip3 install xlwings
+#
+  #    - name: Install Dependencies
+  #      run: sudo -H pip3 install -r requirements.txt
+#
+  #    - name: Run Pytest
+  #      run: python3 -m pytest
