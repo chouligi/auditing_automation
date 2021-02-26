@@ -1,7 +1,6 @@
-from auditing_automation.utils import (
+from auditing_automation.excel_utils import (
     load_xl_workbook,
     get_worksheet_values_from_workbook,
-    get_columns,
     create_new_workbook,
     copy_sheet_in_same_workbook,
 )
@@ -32,24 +31,6 @@ def test_get_worksheet_values_from_workbook_contain_data(test_workbook):
     pd_df = pd.DataFrame(worksheet_values)
 
     assert len(pd_df) > 0
-
-
-def test_get_columns(test_workbook):
-    imported_workbook = load_xl_workbook(path=test_workbook)
-    worksheet_values = get_worksheet_values_from_workbook(imported_workbook, 'Trial Balance')
-
-    columns = get_columns(worksheet_values)
-    expected_output = (
-        'GL Acct',
-        'Name',
-        'PY 31.12.2019',
-        'CY 31.12.2020',
-        'Mapping',
-        'Subcategory',
-        None,
-        'Input - Mapping',
-    )
-    assert columns == expected_output
 
 
 def test_copy_sheet_in_same_workbook(test_workbook):

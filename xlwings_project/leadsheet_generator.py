@@ -1,5 +1,5 @@
 import xlwings as xw
-import auditing_automation.utils as utils
+import auditing_automation.excel_utils as utils
 import os
 
 INPUT_WORKSHEET_NAME = 'Trial Balance'

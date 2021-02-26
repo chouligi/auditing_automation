@@ -16,10 +16,6 @@ def get_worksheet_values_from_workbook(wookrbook: Workbook, worksheet_name: str)
     return wookrbook[worksheet_name].values
 
 
-def get_columns(data: GeneratorType) -> str:
-    return next(data)[0:]
-
-
 def copy_sheet_in_same_workbook(workbook_path: str, sheet_to_copy_name: str, name_of_new_sheet: str):
     workbook_to_copy = xw.Book(workbook_path)
     sheet_to_copy = workbook_to_copy.sheets[sheet_to_copy_name]
