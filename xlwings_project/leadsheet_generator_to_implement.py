@@ -1,6 +1,7 @@
 import xlwings as xw
 import pandas as pd
 import auditing_automation.excel_utils as utils
+import auditing_automation.python_utils as py_utils
 import os
 
 INPUT_WORKSHEET_NAME = 'Trial Balance'
@@ -22,7 +23,7 @@ def main():
     values = df[INPUT_WORKSHEET_NAME].values
     # columns = next(data)[0:]
 
-    columns = utils.get_columns(values)
+    columns = py_utils.get_columns(values)
     p_df = pd.DataFrame(values, columns=columns)
 
     path = '/Users/Fosa/PythonProjects/git_tree/auditing_automation/xlwings_project/'

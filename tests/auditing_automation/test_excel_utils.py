@@ -3,6 +3,9 @@ from auditing_automation.excel_utils import (
     get_worksheet_values_from_workbook,
     create_new_workbook,
     copy_sheet_in_same_workbook,
+    create_leadsheet,
+    create_pandas_dataframe_from_worksheet,
+    write_dataframe_in_worksheet,
 )
 import pandas as pd
 from openpyxl.workbook.workbook import Workbook
@@ -52,6 +55,35 @@ def test_copy_sheet_in_same_workbook(test_workbook):
 
 
 def test_create_new_workbook():
-    test_name = 'test'
+    test_name = 'test-leadsheet.xlsx'
     create_new_workbook(output_path=test_name)
-    os.remove(f'{test_name}-leadsheet.xlsx')
+    os.remove(test_name)
+
+
+def test_create_pandas_dataframe_from_worksheet_is_pandas_df(test_workbook):
+
+    pd_df = create_pandas_dataframe_from_worksheet(workbook_path=test_workbook, sheet_to_modify_name='Trial Balance')
+    assert isinstance(pd_df, pd.DataFrame)
+
+
+def test_create_pandas_dataframe_from_worksheet_is_not_empty(test_workbook):
+    pd_df = create_pandas_dataframe_from_worksheet(workbook_path=test_workbook, sheet_to_modify_name='Trial Balance')
+    assert len(pd_df) > 0
+
+
+def test_write_dataframe_in_worksheet(test_workbook):
+    sheet_to_modify_name = 'Trial Balance'
+    new_workbook_path = 'created-leadsheet.xlsx'
+    formatted_dataframe = create_pandas_dataframe_from_worksheet(
+        workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
+    )
+
+    write_dataframe_in_worksheet(dataframe=formatted_dataframe, workbook_path=new_workbook_path)
+
+
+def test_create_leadsheet(test_workbook):
+    sheet_to_modify_name = 'Trial Balance'
+    new_workbook_path = 'created-leadsheet.xlsx'
+    create_leadsheet(
+        workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name, new_workbook_path=new_workbook_path
+    )
