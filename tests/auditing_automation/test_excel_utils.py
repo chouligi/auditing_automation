@@ -9,6 +9,7 @@ from auditing_automation.excel_utils import (
     create_pandas_leadsheet_given_mapping,
     create_significant_leadsheets,
     create_insignificant_leadsheets,
+    get_insignificant_mappings,
 )
 import pandas as pd
 from openpyxl.workbook.workbook import Workbook
@@ -166,3 +167,16 @@ def test_create_insignificant_leadsheets(test_workbook):
 
     assert os.path.exists(INSIGNIFICANT_LEADSHEETS_PATH)
     os.remove(INSIGNIFICANT_LEADSHEETS_PATH)
+
+
+def test_get_insignificant_mappings(test_workbook):
+    sheet_to_modify_name = 'Trial Balance'
+    significant_mappings = 'Cash'
+
+    pd_df = create_pandas_dataframe_from_worksheet(
+        workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
+    )
+
+    insignificant_mappings = get_insignificant_mappings(pd_df, significant_mappings)
+
+    assert insignificant_mappings == ['Trade And Other Receivables', 'Other Liabilities']

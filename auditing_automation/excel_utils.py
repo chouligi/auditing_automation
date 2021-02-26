@@ -114,3 +114,18 @@ def create_insignificant_leadsheets(
     insignificant_mappings_df = pd_df[pd_df['Mapping'].isin(insignificant_mappings)]
 
     write_pandas_dataframe_in_worksheet(dataframe=insignificant_mappings_df, workbook_path=output_path)
+
+
+def get_insignificant_mappings(dataframe, significant_mappings):
+
+    insignificant_mappings = list(dataframe['Mapping'].unique())
+
+    for element in insignificant_mappings:
+        if element in significant_mappings:
+            insignificant_mappings.remove(element)
+
+    return insignificant_mappings
+
+
+# todo: add a column Significant mappings (list)
+# use this to get which are the significant columns

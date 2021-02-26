@@ -11,10 +11,17 @@ TEST_SHEET_PATH = os.path.join(THIS_DIR, 'test_sheet.xlsx')
 
 
 SIGNIFICANT_MAPPINGS = ['Cash', 'Other Liabilities']
-INSIGNIFICANT_MAPPINGS = ['Trade And Other Receivables']
 
 
 def main():
+    pd_df = excel_utils.create_pandas_dataframe_from_worksheet(
+        workbook_path=TEST_SHEET_PATH, sheet_to_modify_name=INPUT_WORKSHEET_NAME
+    )
+
+    insignificant_mappings = excel_utils.get_insignificant_mappings(
+        dataframe=pd_df, significant_mappings=SIGNIFICANT_MAPPINGS
+    )
+
     excel_utils.create_significant_leadsheets(
         workbook_path=TEST_SHEET_PATH,
         sheet_to_modify_name=INPUT_WORKSHEET_NAME,
@@ -26,7 +33,7 @@ def main():
         workbook_path=TEST_SHEET_PATH,
         sheet_to_modify_name=INPUT_WORKSHEET_NAME,
         output_path=f'{THIS_DIR}/insignificant-leadsheets.xlsx',
-        insignificant_mappings=INSIGNIFICANT_MAPPINGS,
+        insignificant_mappings=insignificant_mappings,
     )
 
 
