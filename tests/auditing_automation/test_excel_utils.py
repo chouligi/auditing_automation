@@ -3,15 +3,19 @@ from auditing_automation.excel_utils import (
     get_worksheet_values_from_workbook,
     create_new_workbook,
     copy_sheet_in_same_workbook,
-    create_leadsheet,
+    create_leadsheet_given_mapping,
     create_pandas_dataframe_from_worksheet,
-    write_dataframe_in_worksheet,
+    write_pandas_dataframe_in_worksheet,
+    create_pandas_leadsheet_given_mapping,
+    create_significant_leadsheets,
+    create_insignificant_leadsheets,
 )
 import pandas as pd
 from openpyxl.workbook.workbook import Workbook
 import types
 import xlwings as xw
 import os
+import shutil
 
 
 def test_load_xl_workbook_is_openpyxl_workbookw(test_workbook):
@@ -71,7 +75,21 @@ def test_create_pandas_dataframe_from_worksheet_is_not_empty(test_workbook):
     assert len(pd_df) > 0
 
 
-def test_write_dataframe_in_worksheet(test_workbook):
+def test_create_pandas_leadsheet_given_mapping_contains_cash_only(test_workbook):
+    pd_df = create_pandas_dataframe_from_worksheet(workbook_path=test_workbook, sheet_to_modify_name='Trial Balance')
+    cash_pd = create_pandas_leadsheet_given_mapping(dataframe=pd_df, mapping='Cash')
+
+    assert cash_pd['Mapping'].unique() == ['Cash']
+
+
+def test_create_pandas_leadsheet_given_mapping_contains_other_liabilities_only(test_workbook):
+    pd_df = create_pandas_dataframe_from_worksheet(workbook_path=test_workbook, sheet_to_modify_name='Trial Balance')
+    cash_pd = create_pandas_leadsheet_given_mapping(dataframe=pd_df, mapping='Other Liabilities')
+
+    assert cash_pd['Mapping'].unique() == ['Other Liabilities']
+
+
+def test_write_pandas_dataframe_in_worksheet(test_workbook):
     sheet_to_modify_name = 'Trial Balance'
     TEST_WORKBOOK_NAME = 'created_test_workbook.xlsx'
 
@@ -81,15 +99,70 @@ def test_write_dataframe_in_worksheet(test_workbook):
 
     create_new_workbook(TEST_WORKBOOK_NAME)
 
-    write_dataframe_in_worksheet(dataframe=formatted_dataframe, workbook_path=TEST_WORKBOOK_NAME)
+    write_pandas_dataframe_in_worksheet(dataframe=formatted_dataframe, workbook_path=TEST_WORKBOOK_NAME)
+
+    # todo: do assertion
 
     os.remove(TEST_WORKBOOK_NAME)
 
 
-def test_create_leadsheet(test_workbook):
+def test_create_leadsheet_given_mapping(test_workbook):
     sheet_to_modify_name = 'Trial Balance'
     new_workbook_path = 'created-leadsheet.xlsx'
-    create_leadsheet(
-        workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name, new_workbook_path=new_workbook_path
+    create_leadsheet_given_mapping(
+        workbook_path=test_workbook,
+        sheet_to_modify_name=sheet_to_modify_name,
+        new_workbook_path=new_workbook_path,
+        mapping='Cash',
     )
+    # todo: do assertion
+
     os.remove(new_workbook_path)
+
+
+def test_create_significant_leadsheets(test_workbook):
+
+    sheet_to_modify_name = 'Trial Balance'
+
+    pd_df = create_pandas_dataframe_from_worksheet(
+        workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
+    )
+
+    significant_mappings = pd_df['Mapping'].unique()
+
+    SIGNIFICANT_DIR = 'signficant_leadsheets'
+
+    assert not os.path.isdir(SIGNIFICANT_DIR)
+
+    os.mkdir(SIGNIFICANT_DIR)
+
+    create_significant_leadsheets(
+        workbook_path=test_workbook,
+        sheet_to_modify_name=sheet_to_modify_name,
+        output_path=SIGNIFICANT_DIR,
+        significant_mappings=significant_mappings,
+    )
+
+    assert os.path.isdir(SIGNIFICANT_DIR)
+
+    assert os.path.exists(os.path.join(SIGNIFICANT_DIR, 'Cash-leadsheet.xlsx'))
+
+    shutil.rmtree(SIGNIFICANT_DIR)
+
+
+def test_create_insignificant_leadsheets(test_workbook):
+    sheet_to_modify_name = 'Trial Balance'
+
+    insignificant_mappings = ['Other Liabilities', 'Trade And Other Receivables']
+
+    INSIGNIFICANT_LEADSHEETS_PATH = 'insignificant-leadsheets.xlsx'
+
+    create_insignificant_leadsheets(
+        workbook_path=test_workbook,
+        sheet_to_modify_name=sheet_to_modify_name,
+        output_path=INSIGNIFICANT_LEADSHEETS_PATH,
+        insignificant_mappings=insignificant_mappings,
+    )
+
+    assert os.path.exists(INSIGNIFICANT_LEADSHEETS_PATH)
+    os.remove(INSIGNIFICANT_LEADSHEETS_PATH)
