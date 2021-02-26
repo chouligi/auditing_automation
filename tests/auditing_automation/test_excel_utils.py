@@ -85,6 +85,7 @@ def test_write_dataframe_in_worksheet(test_workbook):
 
     os.remove(TEST_WORKBOOK_NAME)
 
+
 def test_create_leadsheet(test_workbook):
     sheet_to_modify_name = 'Trial Balance'
     new_workbook_path = 'created-leadsheet.xlsx'
@@ -92,4 +93,3 @@ def test_create_leadsheet(test_workbook):
         workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name, new_workbook_path=new_workbook_path
     )
     os.remove(new_workbook_path)
-
