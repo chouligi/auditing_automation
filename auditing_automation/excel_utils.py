@@ -10,7 +10,6 @@ from typing import List
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(THIS_DIR, 'data')
 
-# COLUMNS_OF_INTEREST = ['GL Acct', 'Name', 'PY 31.12.2019', 'CY 31.12.2020', 'Mapping', 'Subcategory']
 COLUMNS_TO_USE = ['GL Acct', 'Name', 'PY 31.12.2019', 'CY 31.12.2020', 'Mapping', 'Subcategory']
 
 
@@ -22,7 +21,7 @@ def get_worksheet_values_from_workbook(wookrbook: Workbook, worksheet_name: str)
     return wookrbook[worksheet_name].values
 
 
-def copy_sheet_in_same_workbook(workbook_path: str, sheet_to_copy_name: str, name_of_new_sheet: str):
+def copy_sheet_in_same_workbook(workbook_path: str, sheet_to_copy_name: str, name_of_new_sheet: str) -> None:
     workbook_to_copy = xw.Book(workbook_path)
     sheet_to_copy = workbook_to_copy.sheets[sheet_to_copy_name]
 
@@ -34,24 +33,12 @@ def copy_sheet_in_same_workbook(workbook_path: str, sheet_to_copy_name: str, nam
     copied_sheet.name = name_of_new_sheet
 
 
-def create_new_workbook(output_path: str):
+def create_new_workbook(output_path: str) -> None:
     new_workbook = xw.Book()
     new_workbook.save(output_path)
 
 
-# def create_pandas_dataframe_from_worksheet(workbook_path: str, sheet_to_modify_name: str):
-#    INPUT_MAPPING_COL = 'Input - Mapping'
-#
-#    workbook = load_xl_workbook(workbook_path)
-#    values = workbook[sheet_to_modify_name].values
-#    columns = py_utils.get_columns(values)
-#    p_df = pd.DataFrame(values, columns=columns)
-#    required_mapping_type = p_df[INPUT_MAPPING_COL][0]
-#
-#    return p_df[p_df['Mapping'] == required_mapping_type]
-
-
-def create_pandas_dataframe_from_worksheet(workbook_path: str, sheet_to_modify_name: str):
+def create_pandas_dataframe_from_worksheet(workbook_path: str, sheet_to_modify_name: str) -> pd.DataFrame:
     workbook = load_xl_workbook(workbook_path)
     values = workbook[sheet_to_modify_name].values
     columns = py_utils.get_columns(values)
@@ -59,7 +46,7 @@ def create_pandas_dataframe_from_worksheet(workbook_path: str, sheet_to_modify_n
     return pd.DataFrame(values, columns=columns)
 
 
-def create_pandas_leadsheet_given_mapping(dataframe: pd.DataFrame, mapping: str):
+def create_pandas_leadsheet_given_mapping(dataframe: pd.DataFrame, mapping: str) -> pd.DataFrame:
     return dataframe[dataframe['Mapping'] == mapping]
 
 
@@ -70,7 +57,7 @@ def write_pandas_dataframe_in_worksheet(dataframe: pd.DataFrame, workbook_path: 
 
 def create_leadsheet_given_mapping(
     workbook_path: str, sheet_to_modify_name: str, new_workbook_path: str, mapping='str'
-):
+) -> None:
     """
     This function reads a sheet from workbook_path, and creates a new workbook B with a subset
     of the sheet of workbook A.
@@ -88,8 +75,8 @@ def create_leadsheet_given_mapping(
 
 
 def create_significant_leadsheets(
-    workbook_path: str, sheet_to_modify_name: str, output_path: str, significant_mappings: List
-):
+    workbook_path: str, sheet_to_modify_name: str, output_path: str, significant_mappings: List[str]
+) -> None:
     for mapping in significant_mappings:
         create_leadsheet_given_mapping(
             workbook_path=workbook_path,
@@ -98,15 +85,16 @@ def create_significant_leadsheets(
             mapping=mapping,
         )
 
-    # def create_pandas_insignificant_dataframe()->pd.DataFrame:
-    """
-    This function creates the appropriate form for insignificant leadsheets
-    """
+
+# def create_pandas_insignificant_dataframe()->pd.DataFrame -> pd.DataFrame:
+#     """
+#     This function creates the appropriate form for insignificant leadsheets
+#     """
 
 
 def create_insignificant_leadsheets(
-    workbook_path: str, sheet_to_modify_name: str, output_path: str, insignificant_mappings: List
-):
+    workbook_path: str, sheet_to_modify_name: str, output_path: str, insignificant_mappings: List[str]
+) -> None:
     pd_df = create_pandas_dataframe_from_worksheet(
         workbook_path=workbook_path, sheet_to_modify_name=sheet_to_modify_name
     )
@@ -118,7 +106,7 @@ def create_insignificant_leadsheets(
     write_pandas_dataframe_in_worksheet(dataframe=insignificant_mappings_df[COLUMNS_TO_USE], workbook_path=output_path)
 
 
-def get_insignificant_mappings(dataframe, significant_mappings):
+def get_insignificant_mappings(dataframe: pd.DataFrame, significant_mappings: List[str]) -> List[str]:
 
     insignificant_mappings = list(dataframe['Mapping'].unique())
 
@@ -129,5 +117,4 @@ def get_insignificant_mappings(dataframe, significant_mappings):
     return insignificant_mappings
 
 
-# todo: add a column Significant mappings (list)
-# use this to get which are the significant columns
+# todo: add a column Significant mappings (list) or replace the input mapping
