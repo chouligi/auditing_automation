@@ -180,3 +180,16 @@ def test_get_insignificant_mappings(test_workbook):
     insignificant_mappings = get_insignificant_mappings(pd_df, significant_mappings)
 
     assert insignificant_mappings == ['Trade And Other Receivables', 'Other Liabilities']
+
+
+def test_pd_template(test_workbook):
+    sheet_to_modify_name = 'Trial Balance'
+
+    pd_df = create_pandas_dataframe_from_worksheet(
+        workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
+    )
+
+    # COLUMNS_TO_USE = ['GL Acct', 'Name', 'PY 31.12.2019', 'CY 31.12.2020', 'Mapping', 'Subcategory']
+
+    # Todo enrich the test with proper templating pd function
+    assert isinstance(pd_df, pd.DataFrame)

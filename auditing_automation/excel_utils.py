@@ -10,7 +10,8 @@ from typing import List
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(THIS_DIR, 'data')
 
-COLUMNS_OF_INTEREST = ['GL Acct', 'Name', 'PY 31.12.2019', 'CY 31.12.2020', 'Mapping', 'Subcategory']
+# COLUMNS_OF_INTEREST = ['GL Acct', 'Name', 'PY 31.12.2019', 'CY 31.12.2020', 'Mapping', 'Subcategory']
+COLUMNS_TO_USE = ['GL Acct', 'Name', 'PY 31.12.2019', 'CY 31.12.2020', 'Mapping', 'Subcategory']
 
 
 def load_xl_workbook(path: str) -> Workbook:
@@ -82,7 +83,8 @@ def create_leadsheet_given_mapping(
     mapping_dataframe = create_pandas_leadsheet_given_mapping(dataframe=formatted_dataframe, mapping=mapping)
 
     create_new_workbook(output_path=new_workbook_path)
-    write_pandas_dataframe_in_worksheet(dataframe=mapping_dataframe, workbook_path=new_workbook_path)
+
+    write_pandas_dataframe_in_worksheet(dataframe=mapping_dataframe[COLUMNS_TO_USE], workbook_path=new_workbook_path)
 
 
 def create_significant_leadsheets(
@@ -113,7 +115,7 @@ def create_insignificant_leadsheets(
 
     insignificant_mappings_df = pd_df[pd_df['Mapping'].isin(insignificant_mappings)]
 
-    write_pandas_dataframe_in_worksheet(dataframe=insignificant_mappings_df, workbook_path=output_path)
+    write_pandas_dataframe_in_worksheet(dataframe=insignificant_mappings_df[COLUMNS_TO_USE], workbook_path=output_path)
 
 
 def get_insignificant_mappings(dataframe, significant_mappings):
