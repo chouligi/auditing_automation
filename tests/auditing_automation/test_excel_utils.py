@@ -182,6 +182,20 @@ def test_get_insignificant_mappings(test_workbook):
     assert insignificant_mappings == ['Trade And Other Receivables', 'Other Liabilities']
 
 
+def test_get_insignificant_mappings_none_remaining(test_workbook):
+    sheet_to_modify_name = 'Trial Balance'
+    significant_mappings = ['Cash', 'Trade And Other Receivables', 'Other Liabilities']
+
+    pd_df = create_pandas_dataframe_from_worksheet(
+        workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
+    )
+
+    insignificant_mappings = get_insignificant_mappings(pd_df, significant_mappings)
+
+    # todo: make this test pass!
+    # assert insignificant_mappings == []
+
+
 def test_pd_template(test_workbook):
     sheet_to_modify_name = 'Trial Balance'
 
