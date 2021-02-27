@@ -192,8 +192,7 @@ def test_get_insignificant_mappings_none_remaining(test_workbook):
 
     insignificant_mappings = get_insignificant_mappings(pd_df, significant_mappings)
 
-    # todo: make this test pass!
-    # assert insignificant_mappings == []
+    assert insignificant_mappings == []
 
 
 def test_pd_template(test_workbook):

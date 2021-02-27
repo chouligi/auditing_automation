@@ -108,11 +108,13 @@ def create_insignificant_leadsheets(
 
 def get_insignificant_mappings(dataframe: pd.DataFrame, significant_mappings: List[str]) -> List[str]:
 
-    insignificant_mappings = list(dataframe['Mapping'].unique())
+    all_mappings = list(dataframe['Mapping'].unique())
 
-    for element in insignificant_mappings:
-        if element in significant_mappings:
-            insignificant_mappings.remove(element)
+    insignificant_mappings = []
+
+    for element in all_mappings:
+        if element not in significant_mappings:
+            insignificant_mappings.append(element)
 
     return insignificant_mappings
 
