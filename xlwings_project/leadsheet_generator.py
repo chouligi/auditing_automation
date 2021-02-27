@@ -7,10 +7,10 @@ INPUT_MAPPING_COL = 'Input - Mapping'
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(THIS_DIR, 'data')
 
-TEST_SHEET_PATH = os.path.join(THIS_DIR, 'test_sheet.xlsx')
+TEST_SHEET_PATH = os.path.join(THIS_DIR, 'enriched_template_balance_sheet.xlsx')
 
 
-SIGNIFICANT_MAPPINGS = ['Cash', 'Other Liabilities']
+SIGNIFICANT_MAPPINGS = ['Cash', 'Other Liabilities', 'Trade And Other Receivables']
 
 
 def main():
