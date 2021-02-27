@@ -7,15 +7,16 @@ INPUT_MAPPING_COL = 'Input - Mapping'
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(THIS_DIR, 'data')
 
-TEST_SHEET_PATH = os.path.join(THIS_DIR, 'enriched_template_balance_sheet.xlsx')
-
-
 SIGNIFICANT_MAPPINGS = ['Cash', 'Other Liabilities', 'Trade And Other Receivables']
 
 
 def main():
+    wb = xw.Book.caller()
+
+    template_balance_sheet_path = str(wb.fullname)
+
     pd_df = excel_utils.create_pandas_dataframe_from_worksheet(
-        workbook_path=TEST_SHEET_PATH, sheet_to_modify_name=INPUT_WORKSHEET_NAME
+        workbook_path=template_balance_sheet_path, sheet_to_modify_name=INPUT_WORKSHEET_NAME
     )
 
     insignificant_mappings = excel_utils.get_insignificant_mappings(
@@ -23,14 +24,14 @@ def main():
     )
 
     excel_utils.create_significant_leadsheets(
-        workbook_path=TEST_SHEET_PATH,
+        workbook_path=template_balance_sheet_path,
         sheet_to_modify_name=INPUT_WORKSHEET_NAME,
         output_path=THIS_DIR,
         significant_mappings=SIGNIFICANT_MAPPINGS,
     )
 
     excel_utils.create_insignificant_leadsheets(
-        workbook_path=TEST_SHEET_PATH,
+        workbook_path=template_balance_sheet_path,
         sheet_to_modify_name=INPUT_WORKSHEET_NAME,
         output_path=f'{THIS_DIR}/insignificant-leadsheets.xlsx',
         insignificant_mappings=insignificant_mappings,

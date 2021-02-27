@@ -171,7 +171,7 @@ def test_create_insignificant_leadsheets(test_workbook):
 
 def test_get_insignificant_mappings(test_workbook):
     sheet_to_modify_name = 'Trial Balance'
-    significant_mappings = 'Cash'
+    significant_mappings = ['Cash']
 
     pd_df = create_pandas_dataframe_from_worksheet(
         workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
