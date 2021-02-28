@@ -11,7 +11,8 @@ from auditing_automation.excel_utils import (
     create_insignificant_leadsheets,
     get_insignificant_mappings,
     bring_pandas_dataframe_to_form_for_significant_mapping,
-    copy_sheet_in_new_workbook
+    copy_sheet_in_new_workbook,
+    write_worksheet_in_new_workbook,
 )
 import pandas as pd
 from openpyxl.workbook.workbook import Workbook
@@ -60,13 +61,41 @@ def test_copy_sheet_in_same_workbook(test_workbook):
         if sheet.name != sheet_to_copy_name:
             sheet.delete()
 
-def test_copy_sheet_in_new_workbook(test_formatted_leadsheet_template):
+
+def test_copy_sheet_in_new_workbook_new_sheet_name_correct(test_formatted_leadsheet_template):
     sheet_to_copy_name = 'Leadsheet'
-    name_of_new_sheet = 'Newly created Leadsheet'
-    copy_sheet_in_new_workbook(workbook_path=test_formatted_leadsheet_template,
-                               sheet_to_copy_name=sheet_to_copy_name,
-                               name_of_new_worbkook='created-formatted-test-leasheet.xlsx',
-                               name_of_new_sheet=name_of_new_sheet)
+    name_of_new_sheet = 'Cash-Leadsheet'
+    name_of_new_workbook = 'created-formatted-test-copy-leadsheet.xlsx'
+
+    copy_sheet_in_new_workbook(
+        workbook_path=test_formatted_leadsheet_template,
+        sheet_to_copy_name=sheet_to_copy_name,
+        name_of_new_workbook=name_of_new_workbook,
+        name_of_new_sheet=name_of_new_sheet,
+    )
+
+    new_workbook = xw.Book(name_of_new_workbook)
+    assert new_workbook.sheets[0].name == name_of_new_sheet
+
+    os.remove(name_of_new_workbook)
+
+
+def test_write_worksheet_in_new_workbook_name_is_correct(test_formatted_leadsheet_template):
+    workbook_with_sheet_to_copy = xw.Book(test_formatted_leadsheet_template)
+    new_workbook_name = 'created-formatted-test-write-leadsheet.xlsx'
+
+    sheet_to_copy_name = 'Leadsheet'
+    new_worksheet_name = 'Created Leadsheet'
+    sheet_to_copy = workbook_with_sheet_to_copy.sheets[sheet_to_copy_name]
+    create_new_workbook(new_workbook_name)
+
+    workbook = xw.Book(new_workbook_name)
+    write_worksheet_in_new_workbook(
+        workbook=workbook, sheet_to_copy=sheet_to_copy, name_of_new_sheet=new_worksheet_name
+    )
+
+    assert workbook.sheets[0].name == new_worksheet_name
+    os.remove(new_workbook_name)
 
 
 def test_create_new_workbook():
@@ -223,17 +252,31 @@ def test_bring_pandas_dataframe_to_form_for_significant_mapping_contains_proper_
     pd_df = create_pandas_dataframe_from_worksheet(
         workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
     )
-    expected_columns = ['GL Acct', 'Name', 'PY 31.12.2019', 'PY Ref', 'CY 31.12.2020', 'CY Ref', 'Movement', 'Perc. Movement', 'Work Performed ref', 'Comments']
+    expected_columns = [
+        'GL Acct',
+        'Name',
+        'PY 31.12.2019',
+        'PY Ref',
+        'CY 31.12.2020',
+        'CY Ref',
+        'Movement',
+        'Perc. Movement',
+        'Work Performed ref',
+        'Comments',
+    ]
     significant_form_pd = bring_pandas_dataframe_to_form_for_significant_mapping(dataframe=pd_df)
     columns = [col for col in significant_form_pd.columns]
 
     assert columns == expected_columns
 
+
 def test_bring_pandas_dataframe_to_form_for_significant_mapping_movement_computed_correctly(test_workbook):
     return
 
+
 def test_bring_pandas_dataframe_to_form_for_significant_mapping_perc_movement_computed_correctly(test_workbook):
     return
+
 
 def test_bring_pandas_dataframe_to_form_for_significant_mapping_perc_movement_returns_1_when_denom_is_0(test_workbook):
     return
