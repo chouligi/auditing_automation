@@ -10,6 +10,8 @@ from auditing_automation.excel_utils import (
     create_significant_leadsheets,
     create_insignificant_leadsheets,
     get_insignificant_mappings,
+    bring_pandas_dataframe_to_form_for_significant_mapping,
+    copy_sheet_in_new_workbook
 )
 import pandas as pd
 from openpyxl.workbook.workbook import Workbook
@@ -57,6 +59,14 @@ def test_copy_sheet_in_same_workbook(test_workbook):
     for sheet in workbook.sheets:
         if sheet.name != sheet_to_copy_name:
             sheet.delete()
+
+def test_copy_sheet_in_new_workbook(test_formatted_leadsheet_template):
+    sheet_to_copy_name = 'Leadsheet'
+    name_of_new_sheet = 'Newly created Leadsheet'
+    copy_sheet_in_new_workbook(workbook_path=test_formatted_leadsheet_template,
+                               sheet_to_copy_name=sheet_to_copy_name,
+                               name_of_new_worbkook='created-formatted-test-leasheet.xlsx',
+                               name_of_new_sheet=name_of_new_sheet)
 
 
 def test_create_new_workbook():
@@ -195,14 +205,35 @@ def test_get_insignificant_mappings_none_remaining(test_workbook):
     assert insignificant_mappings == []
 
 
-def test_pd_template(test_workbook):
+def test_bring_pandas_dataframe_to_form_for_significant_mapping_is_pandas_df(test_workbook):
     sheet_to_modify_name = 'Trial Balance'
 
     pd_df = create_pandas_dataframe_from_worksheet(
         workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
     )
 
-    # COLUMNS_TO_USE = ['GL Acct', 'Name', 'PY 31.12.2019', 'CY 31.12.2020', 'Mapping', 'Subcategory']
+    significant_form_pd = bring_pandas_dataframe_to_form_for_significant_mapping(dataframe=pd_df)
 
-    # Todo enrich the test with proper templating pd function
-    assert isinstance(pd_df, pd.DataFrame)
+    assert isinstance(significant_form_pd, pd.DataFrame)
+
+
+def test_bring_pandas_dataframe_to_form_for_significant_mapping_contains_proper_columns(test_workbook):
+    sheet_to_modify_name = 'Trial Balance'
+
+    pd_df = create_pandas_dataframe_from_worksheet(
+        workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
+    )
+    expected_columns = ['GL Acct', 'Name', 'PY 31.12.2019', 'PY Ref', 'CY 31.12.2020', 'CY Ref', 'Movement', 'Perc. Movement', 'Work Performed ref', 'Comments']
+    significant_form_pd = bring_pandas_dataframe_to_form_for_significant_mapping(dataframe=pd_df)
+    columns = [col for col in significant_form_pd.columns]
+
+    assert columns == expected_columns
+
+def test_bring_pandas_dataframe_to_form_for_significant_mapping_movement_computed_correctly(test_workbook):
+    return
+
+def test_bring_pandas_dataframe_to_form_for_significant_mapping_perc_movement_computed_correctly(test_workbook):
+    return
+
+def test_bring_pandas_dataframe_to_form_for_significant_mapping_perc_movement_returns_1_when_denom_is_0(test_workbook):
+    return

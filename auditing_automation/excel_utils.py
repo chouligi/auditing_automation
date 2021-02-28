@@ -32,6 +32,19 @@ def copy_sheet_in_same_workbook(workbook_path: str, sheet_to_copy_name: str, nam
 
     copied_sheet.name = name_of_new_sheet
 
+def copy_sheet_in_new_workbook(workbook_path: str, sheet_to_copy_name: str, name_of_new_worbkook: str,name_of_new_sheet: str) -> None:
+    workbook_to_copy = xw.Book(workbook_path)
+    sheet_to_copy = workbook_to_copy.sheets[sheet_to_copy_name]
+    copy_sheet_in_same_workbook(workbook_path=workbook_path,
+                                sheet_to_copy_name=sheet_to_copy_name,
+                                name_of_new_sheet=name_of_new_sheet)
+
+    create_new_workbook(output_path=name_of_new_worbkook)
+    new_worbkook = xw.Book(name_of_new_worbkook)
+
+    new_sheet = new_worbkook.sheets[0]
+
+    sheet_to_copy.api_copy_worksheet(before_=sheet_to_copy.api)
 
 def create_new_workbook(output_path: str) -> None:
     new_workbook = xw.Book()
@@ -56,22 +69,44 @@ def write_pandas_dataframe_in_worksheet(dataframe: pd.DataFrame, workbook_path: 
 
 
 def create_leadsheet_given_mapping(
-    workbook_path: str, sheet_to_modify_name: str, new_workbook_path: str, mapping='str'
+    workbook_path: str, sheet_to_modify_name: str, new_workbook_path: str, mapping:str
 ) -> None:
     """
     This function reads a sheet from workbook_path, and creates a new workbook B with a subset
     of the sheet of workbook A.
     :return:
     """
-    formatted_dataframe = create_pandas_dataframe_from_worksheet(
+    dataframe = create_pandas_dataframe_from_worksheet(
         workbook_path=workbook_path, sheet_to_modify_name=sheet_to_modify_name
     )
 
-    mapping_dataframe = create_pandas_leadsheet_given_mapping(dataframe=formatted_dataframe, mapping=mapping)
+    mapping_dataframe = create_pandas_leadsheet_given_mapping(dataframe=dataframe, mapping=mapping)
 
+    # Todo: instead of creating new workbook, copy template workbook with formatting, to new_workbook_path
     create_new_workbook(output_path=new_workbook_path)
 
-    write_pandas_dataframe_in_worksheet(dataframe=mapping_dataframe[COLUMNS_TO_USE], workbook_path=new_workbook_path)
+
+    formatted_signficant_dataframe = bring_pandas_dataframe_to_form_for_significant_mapping(dataframe=mapping_dataframe)
+
+    write_pandas_dataframe_in_worksheet(dataframe=formatted_signficant_dataframe, workbook_path=new_workbook_path)
+
+
+def bring_pandas_dataframe_to_form_for_significant_mapping(dataframe: pd.DataFrame) -> pd.DataFrame:
+
+    columns = ['GL Acct', 'Name', 'PY 31.12.2019', 'PY Ref', 'CY 31.12.2020', 'CY Ref', 'Movement', 'Perc. Movement', 'Work Performed ref', 'Comments']
+    singificant_pd = pd.DataFrame(columns=columns)
+
+    singificant_pd['GL Acct']  = dataframe['GL Acct']
+    singificant_pd['Name']  = dataframe['Name']
+    singificant_pd['PY 31.12.2019'] = dataframe['PY 31.12.2019']
+    singificant_pd['CY 31.12.2020'] = dataframe['CY 31.12.2020']
+
+    singificant_pd['Movement'] = singificant_pd['CY 31.12.2020'] - singificant_pd['PY 31.12.2019']
+    # todo: if denominator is 0, set Perc. Movement to 1.
+    singificant_pd['Perc. Movement'] = singificant_pd['Movement'] / singificant_pd['PY 31.12.2019']
+
+    return singificant_pd
+
 
 
 def create_significant_leadsheets(
