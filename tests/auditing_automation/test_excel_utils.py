@@ -13,6 +13,7 @@ from auditing_automation.excel_utils import (
     bring_pandas_dataframe_to_form_for_significant_mapping,
     copy_sheet_in_new_workbook,
     write_worksheet_in_new_workbook,
+    convert_spaces_to_underscores,
 )
 import pandas as pd
 from openpyxl.workbook.workbook import Workbook
@@ -20,6 +21,8 @@ import types
 import xlwings as xw
 import os
 import shutil
+
+SIGNIFICANT_DIR = 'signficant_leadsheets'
 
 
 def test_load_xl_workbook_is_openpyxl_workbookw(test_workbook):
@@ -146,21 +149,45 @@ def test_write_pandas_dataframe_in_worksheet(test_workbook):
     os.remove(TEST_WORKBOOK_NAME)
 
 
-def test_create_leadsheet_given_mapping(test_workbook):
+def test_create_leadsheet_given_mapping_cash(test_workbook, test_formatted_leadsheet_template):
     sheet_to_modify_name = 'Trial Balance'
-    new_workbook_path = 'created-leadsheet.xlsx'
+    new_workbook_path = 'created-leadsheet-cash.xlsx'
     create_leadsheet_given_mapping(
         workbook_path=test_workbook,
         sheet_to_modify_name=sheet_to_modify_name,
         new_workbook_path=new_workbook_path,
         mapping='Cash',
+        formatted_template_workbook=test_formatted_leadsheet_template,
     )
-    # todo: do assertion
+
+    assert os.path.exists(new_workbook_path)
 
     os.remove(new_workbook_path)
 
 
-def test_create_significant_leadsheets(test_workbook):
+def test_create_leadsheet_given_mapping_name_with_spaces(test_workbook, test_formatted_leadsheet_template):
+    sheet_to_modify_name = 'Trial Balance'
+    new_workbook_path = 'created-leadsheet-name-with-spaces.xlsx'
+    create_leadsheet_given_mapping(
+        workbook_path=test_workbook,
+        sheet_to_modify_name=sheet_to_modify_name,
+        new_workbook_path=new_workbook_path,
+        mapping='Worksheet Name With Spaces',
+        formatted_template_workbook=test_formatted_leadsheet_template,
+    )
+
+    assert os.path.exists(new_workbook_path)
+
+    os.remove(new_workbook_path)
+
+
+def test_convert_spaces_to_underscores():
+
+    assert convert_spaces_to_underscores('Trades And Other Receivables') == 'Trades_And_Other_Receivables'
+    assert convert_spaces_to_underscores('Bla Bla Blablabla') == 'Bla_Bla_Blablabla'
+
+
+def test_create_significant_leadsheets(test_workbook, test_formatted_leadsheet_template):
 
     sheet_to_modify_name = 'Trial Balance'
 
@@ -169,8 +196,6 @@ def test_create_significant_leadsheets(test_workbook):
     )
 
     significant_mappings = pd_df['Mapping'].unique()
-
-    SIGNIFICANT_DIR = 'signficant_leadsheets'
 
     assert not os.path.isdir(SIGNIFICANT_DIR)
 
@@ -181,6 +206,7 @@ def test_create_significant_leadsheets(test_workbook):
         sheet_to_modify_name=sheet_to_modify_name,
         output_path=SIGNIFICANT_DIR,
         significant_mappings=significant_mappings,
+        formatted_template_workbook=test_formatted_leadsheet_template,
     )
 
     assert os.path.isdir(SIGNIFICANT_DIR)
