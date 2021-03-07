@@ -184,6 +184,22 @@ def test_create_leadsheet_given_mapping_name_with_spaces(test_workbook, test_for
     os.remove(new_workbook_path)
 
 
+def test_create_leadsheet_given_mapping_data_dir(test_workbook):
+    sheet_to_modify_name = 'Trial Balance'
+    new_workbook_path = 'created-leadsheet-name-data-dir.xlsx'
+
+    FORMATTED_TEMPLATE_WORKBOOK_PATH = '/Users/Fosa/PythonProjects/git_tree/auditing_automation/' \
+                                       'auditing_automation/data/template_to_copy_leadsheet.xlsx'
+
+    create_leadsheet_given_mapping(
+        workbook_path=test_workbook,
+        sheet_to_modify_name=sheet_to_modify_name,
+        new_workbook_path=new_workbook_path,
+        mapping='Worksheet Name With Spaces',
+        formatted_template_workbook=FORMATTED_TEMPLATE_WORKBOOK_PATH,
+    )
+
+
 def test_convert_spaces_to_underscores():
 
     assert convert_spaces_to_underscores('Trades And Other Receivables') == 'Trades_And_Other_Receivables'

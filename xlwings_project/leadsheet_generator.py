@@ -8,7 +8,7 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(THIS_DIR, 'data')
 
 SIGNIFICANT_MAPPINGS = ['Cash', 'Other Liabilities', 'Trade And Other Receivables']
-FORMATTED_TEMPLATE_WORKBOOK_PATH = os.path.join(DATA_DIR, 'template_to_copy_leadsheet.xlsx')
+FORMATTED_TEMPLATE_WORKBOOK_PATH = os.path.join(THIS_DIR, 'leadsheet_format_template.xlsx')
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
         significant_mappings=SIGNIFICANT_MAPPINGS,
         formatted_template_workbook=FORMATTED_TEMPLATE_WORKBOOK_PATH,
     )
-
+    #
     excel_utils.create_nonsignificant_leadsheets(
         trial_balance_workbook_path=template_balance_sheet_path,
         trial_balance_sheet_name=INPUT_WORKSHEET_NAME,
