@@ -16,6 +16,7 @@ from auditing_automation.excel_utils import (
     convert_spaces_to_underscores,
     create_nonsignificant_workbook,
     create_nonsigificant_leadsheet_given_mapping,
+    get_significant_mappings,
 )
 import pandas as pd
 from openpyxl.workbook.workbook import Workbook
@@ -26,6 +27,7 @@ import shutil
 
 SIGNIFICANT_DIR = 'signficant_leadsheets'
 NONSIGNIFICANT_LEADSHEETS_PATH = 'nonsignificant-leadsheets.xlsx'
+SIGNIFICANT_MAPPINGS_COL = 'Significant Mappings'
 
 
 def test_load_xl_workbook_is_openpyxl_workbookw(test_workbook):
@@ -182,22 +184,6 @@ def test_create_leadsheet_given_mapping_name_with_spaces(test_workbook, test_for
     assert os.path.exists(new_workbook_path)
 
     os.remove(new_workbook_path)
-
-
-def test_create_leadsheet_given_mapping_data_dir(test_workbook):
-    sheet_to_modify_name = 'Trial Balance'
-    new_workbook_path = 'created-leadsheet-name-data-dir.xlsx'
-
-    FORMATTED_TEMPLATE_WORKBOOK_PATH = '/Users/Fosa/PythonProjects/git_tree/auditing_automation/' \
-                                       'auditing_automation/data/template_to_copy_leadsheet.xlsx'
-
-    create_leadsheet_given_mapping(
-        workbook_path=test_workbook,
-        sheet_to_modify_name=sheet_to_modify_name,
-        new_workbook_path=new_workbook_path,
-        mapping='Worksheet Name With Spaces',
-        formatted_template_workbook=FORMATTED_TEMPLATE_WORKBOOK_PATH,
-    )
 
 
 def test_convert_spaces_to_underscores():
@@ -364,6 +350,16 @@ def test_bring_pandas_dataframe_to_form_for_significant_mapping_contains_proper_
     columns = [col for col in significant_form_pd.columns]
 
     assert columns == expected_columns
+
+
+def test_get_significant_mappings(test_workbook):
+    sheet_name = 'Trial Balance'
+
+    pd_df = create_pandas_dataframe_from_worksheet(workbook_path=test_workbook, sheet_to_modify_name=sheet_name)
+
+    signficant_mappings = get_significant_mappings(dataframe=pd_df, significant_mapping_col=SIGNIFICANT_MAPPINGS_COL)
+
+    assert ['Cash', 'Trade And Other Receivables'] == signficant_mappings
 
 
 def test_bring_pandas_dataframe_to_form_for_significant_mapping_movement_computed_correctly(test_workbook):

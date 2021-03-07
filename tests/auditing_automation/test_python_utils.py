@@ -15,6 +15,6 @@ def test_get_columns(test_workbook):
         'Mapping',
         'Subcategory',
         None,
-        'Input - Mapping',
+        'Significant Mappings',
     )
     assert columns == expected_output

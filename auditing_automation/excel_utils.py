@@ -221,13 +221,6 @@ def create_nonsignificant_leadsheets(
     formatted_template_workbook: str,
     nonsignificant_mappings: List[str],
 ) -> None:
-    # trial_balance_pd = create_pandas_dataframe_from_worksheet(
-    #    workbook_path=trial_balance_workbook_path, sheet_to_modify_name=trial_balance_sheet_name
-    # )
-
-    # nonsignificant_mappings = get_nonsignificant_mappings(dataframe=trial_balance_pd,
-    #                            significant_mappings=significant_mappings)
-    #
     create_nonsignificant_workbook(
         workbook_path=nonsignficant_workbook_path,
         nonsignificant_mappings=nonsignificant_mappings,
@@ -256,4 +249,5 @@ def get_nonsignificant_mappings(dataframe: pd.DataFrame, significant_mappings: L
     return nonsignificant_mappings
 
 
-# todo: add a column Significant mappings (list) -> replace the input mapping
+def get_significant_mappings(dataframe: pd.DataFrame, significant_mapping_col: str) -> List[str]:
+    return list(dataframe[significant_mapping_col].dropna().values)
