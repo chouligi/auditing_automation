@@ -8,12 +8,14 @@ from auditing_automation.excel_utils import (
     write_pandas_dataframe_in_worksheet,
     create_pandas_leadsheet_given_mapping,
     create_significant_leadsheets,
-    create_insignificant_leadsheets,
-    get_insignificant_mappings,
+    create_nonsignificant_leadsheets,
+    get_nonsignificant_mappings,
     bring_pandas_dataframe_to_form_for_significant_mapping,
     copy_sheet_in_new_workbook,
     write_worksheet_in_new_workbook,
     convert_spaces_to_underscores,
+    create_nonsignificant_workbook,
+    create_nonsigificant_leadsheet_given_mapping,
 )
 import pandas as pd
 from openpyxl.workbook.workbook import Workbook
@@ -23,6 +25,7 @@ import os
 import shutil
 
 SIGNIFICANT_DIR = 'signficant_leadsheets'
+NONSIGNIFICANT_LEADSHEETS_PATH = 'nonsignificant-leadsheets.xlsx'
 
 
 def test_load_xl_workbook_is_openpyxl_workbookw(test_workbook):
@@ -216,25 +219,76 @@ def test_create_significant_leadsheets(test_workbook, test_formatted_leadsheet_t
     shutil.rmtree(SIGNIFICANT_DIR)
 
 
-def test_create_insignificant_leadsheets(test_workbook):
+def test_create_nonsigificant_leadsheet_given_mapping(test_workbook, test_formatted_leadsheet_template):
     sheet_to_modify_name = 'Trial Balance'
 
-    insignificant_mappings = ['Other Liabilities', 'Trade And Other Receivables']
+    nonsignificant_mappings = ['Other Liabilities', 'Trade And Other Receivables']
 
-    INSIGNIFICANT_LEADSHEETS_PATH = 'insignificant-leadsheets.xlsx'
+    mapping = 'Trade And Other Receivables'
 
-    create_insignificant_leadsheets(
-        workbook_path=test_workbook,
-        sheet_to_modify_name=sheet_to_modify_name,
-        output_path=INSIGNIFICANT_LEADSHEETS_PATH,
-        insignificant_mappings=insignificant_mappings,
+    workbook_to_add_path = 'test-nonsignificant-leadsheets-given-mapping.xlsx'
+
+    create_nonsignificant_workbook(
+        workbook_path=workbook_to_add_path,
+        nonsignificant_mappings=nonsignificant_mappings,
+        formatted_template_workbook=test_formatted_leadsheet_template,
     )
 
-    assert os.path.exists(INSIGNIFICANT_LEADSHEETS_PATH)
-    os.remove(INSIGNIFICANT_LEADSHEETS_PATH)
+    create_nonsigificant_leadsheet_given_mapping(
+        trial_balance_workbook_path=test_workbook,
+        trial_balance_sheet=sheet_to_modify_name,
+        workbook_to_add_path=workbook_to_add_path,
+        mapping=mapping,
+    )
+
+    nonsignificant_workbook = xw.Book(workbook_to_add_path)
+    nonsignificant_workbook.save(path=workbook_to_add_path)
+    # todo: use this way to load pandas dataframes!
+    excel_file = pd.ExcelFile(workbook_to_add_path)
+    pd_df = excel_file.parse(convert_spaces_to_underscores(mapping))
+
+    assert len(pd_df) > 2
+    os.remove(workbook_to_add_path)
 
 
-def test_get_insignificant_mappings(test_workbook):
+def test_create_nonsignificant_leadsheets(test_workbook, test_formatted_leadsheet_template):
+    sheet_to_modify_name = 'Trial Balance'
+    nonsignificant_workbook_path = 'test-nonsignificant-leadsheets.xlsx'
+
+    nonsignificant_mappings = ['Other Liabilities', 'Trade And Other Receivables']
+
+    create_nonsignificant_leadsheets(
+        trial_balance_workbook_path=test_workbook,
+        trial_balance_sheet_name=sheet_to_modify_name,
+        nonsignficant_workbook_path=nonsignificant_workbook_path,
+        formatted_template_workbook=test_formatted_leadsheet_template,
+        nonsignificant_mappings=nonsignificant_mappings,
+    )
+
+    assert os.path.isfile(nonsignificant_workbook_path)
+    os.remove(nonsignificant_workbook_path)
+
+
+def test_create_nonsignificant_workbook_path_and_number_of_sheets(test_workbook, test_formatted_leadsheet_template):
+    workbook_path = 'test-path-nonsignificant-leadsheets.xlsx'
+
+    nonsignificant_mappings = ['Other Liabilities', 'Trade And Other Receivables']
+
+    create_nonsignificant_workbook(
+        workbook_path=workbook_path,
+        nonsignificant_mappings=nonsignificant_mappings,
+        formatted_template_workbook=test_formatted_leadsheet_template,
+    )
+
+    workbook = xw.Book(workbook_path)
+    assert os.path.exists(workbook_path)
+    sheet_names = [sheet.name for sheet in workbook.sheets]
+    assert len(sheet_names) == len(nonsignificant_mappings)
+
+    os.remove(workbook_path)
+
+
+def test_get_nonsignificant_mappings(test_workbook):
     sheet_to_modify_name = 'Trial Balance'
     significant_mappings = ['Cash']
 
@@ -242,12 +296,12 @@ def test_get_insignificant_mappings(test_workbook):
         workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
     )
 
-    insignificant_mappings = get_insignificant_mappings(pd_df, significant_mappings)
+    nonsignificant_mappings = get_nonsignificant_mappings(pd_df, significant_mappings)
 
-    assert insignificant_mappings == ['Trade And Other Receivables', 'Other Liabilities']
+    assert nonsignificant_mappings == ['Trade And Other Receivables', 'Other Liabilities']
 
 
-def test_get_insignificant_mappings_none_remaining(test_workbook):
+def test_get_nonsignificant_mappings_none_remaining(test_workbook):
     sheet_to_modify_name = 'Trial Balance'
     significant_mappings = ['Cash', 'Trade And Other Receivables', 'Other Liabilities']
 
@@ -255,9 +309,9 @@ def test_get_insignificant_mappings_none_remaining(test_workbook):
         workbook_path=test_workbook, sheet_to_modify_name=sheet_to_modify_name
     )
 
-    insignificant_mappings = get_insignificant_mappings(pd_df, significant_mappings)
+    nonsignificant_mappings = get_nonsignificant_mappings(pd_df, significant_mappings)
 
-    assert insignificant_mappings == []
+    assert nonsignificant_mappings == []
 
 
 def test_bring_pandas_dataframe_to_form_for_significant_mapping_is_pandas_df(test_workbook):

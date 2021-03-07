@@ -47,6 +47,19 @@ def copy_sheet_in_new_workbook(
     )
 
 
+def copy_sheet_in_existing_workbook(
+    workbook_path: str, sheet_to_copy_name: str, name_of_existing_workbook: str, name_of_new_sheet: str
+) -> None:
+    workbook_to_copy = xw.Book(workbook_path)
+    sheet_to_copy = workbook_to_copy.sheets[sheet_to_copy_name]
+
+    new_workbook = xw.Book(name_of_existing_workbook)
+
+    write_worksheet_in_new_workbook(
+        workbook=new_workbook, sheet_to_copy=sheet_to_copy, name_of_new_sheet=name_of_new_sheet
+    )
+
+
 def write_worksheet_in_new_workbook(workbook: xw.Book, sheet_to_copy: xw.Book.sheets, name_of_new_sheet: str):
 
     new_sheet = workbook.sheets[0]
@@ -159,34 +172,88 @@ def create_significant_leadsheets(
         )
 
 
-def create_insignificant_leadsheets(
-    workbook_path: str, sheet_to_modify_name: str, output_path: str, insignificant_mappings: List[str]
+def create_nonsignificant_workbook(
+    workbook_path: str, nonsignificant_mappings: List[str], formatted_template_workbook: str
 ) -> None:
-    pd_df = create_pandas_dataframe_from_worksheet(
-        workbook_path=workbook_path, sheet_to_modify_name=sheet_to_modify_name
+    create_new_workbook(output_path=workbook_path)
+
+    nonsignificant_workbook = xw.Book(workbook_path)
+
+    copy_sheet_in_existing_workbook(
+        workbook_path=formatted_template_workbook,
+        sheet_to_copy_name='Leadsheet',
+        name_of_existing_workbook=workbook_path,
+        name_of_new_sheet=convert_spaces_to_underscores(nonsignificant_mappings[0]),
     )
 
-    create_new_workbook(output_path=output_path)
+    if len(nonsignificant_mappings) > 1:
+        for mapping in nonsignificant_mappings[1:]:
+            copy_sheet_in_same_workbook(
+                workbook_path=workbook_path,
+                sheet_to_copy_name=nonsignificant_workbook.sheets[0].name,
+                name_of_new_sheet=convert_spaces_to_underscores(mapping),
+            )
 
-    insignificant_mappings_df = pd_df[pd_df['Mapping'].isin(insignificant_mappings)]
 
-    write_pandas_dataframe_in_worksheet(dataframe=insignificant_mappings_df[COLUMNS_TO_USE], workbook_path=output_path)
-    # todo: write the dataframes in new sheets.
-    # Make function: create_sheet_within_workbook(workbook_path, sheet_name)
-    # and create sheet for each mapping
+def create_nonsigificant_leadsheet_given_mapping(
+    trial_balance_workbook_path: str, trial_balance_sheet: str, workbook_to_add_path: str, mapping: str
+):
+    """
+    Using the data in the trial_balance_workbook and trial_balance_sheet, creates a new leadsheet in the
+    workbook_to_add_path with name "mapping".
+    """
+    pd_df = create_pandas_dataframe_from_worksheet(
+        workbook_path=trial_balance_workbook_path, sheet_to_modify_name=trial_balance_sheet
+    )
+    workbook_with_nonsignificant = xw.Book(workbook_to_add_path)
+    mapping_dataframe = create_pandas_leadsheet_given_mapping(dataframe=pd_df, mapping=mapping)
+    formatted_signficant_dataframe = bring_pandas_dataframe_to_form_for_significant_mapping(dataframe=mapping_dataframe)
+
+    workbook_with_nonsignificant.sheets[convert_spaces_to_underscores(mapping)].range('A1').options(
+        index=False, header=True
+    ).value = formatted_signficant_dataframe
 
 
-def get_insignificant_mappings(dataframe: pd.DataFrame, significant_mappings: List[str]) -> List[str]:
+def create_nonsignificant_leadsheets(
+    trial_balance_workbook_path: str,
+    trial_balance_sheet_name: str,
+    nonsignficant_workbook_path: str,
+    formatted_template_workbook: str,
+    nonsignificant_mappings: List[str],
+) -> None:
+    # trial_balance_pd = create_pandas_dataframe_from_worksheet(
+    #    workbook_path=trial_balance_workbook_path, sheet_to_modify_name=trial_balance_sheet_name
+    # )
+
+    # nonsignificant_mappings = get_nonsignificant_mappings(dataframe=trial_balance_pd,
+    #                            significant_mappings=significant_mappings)
+    #
+    create_nonsignificant_workbook(
+        workbook_path=nonsignficant_workbook_path,
+        nonsignificant_mappings=nonsignificant_mappings,
+        formatted_template_workbook=formatted_template_workbook,
+    )
+
+    for mapping in nonsignificant_mappings:
+        create_nonsigificant_leadsheet_given_mapping(
+            trial_balance_workbook_path=trial_balance_workbook_path,
+            trial_balance_sheet=trial_balance_sheet_name,
+            workbook_to_add_path=nonsignficant_workbook_path,
+            mapping=mapping,
+        )
+
+
+def get_nonsignificant_mappings(dataframe: pd.DataFrame, significant_mappings: List[str]) -> List[str]:
 
     all_mappings = list(dataframe['Mapping'].unique())
 
-    insignificant_mappings = []
+    nonsignificant_mappings = []
 
     for element in all_mappings:
         if element not in significant_mappings:
-            insignificant_mappings.append(element)
+            nonsignificant_mappings.append(element)
 
-    return insignificant_mappings
+    return nonsignificant_mappings
 
 
 # todo: add a column Significant mappings (list) -> replace the input mapping
