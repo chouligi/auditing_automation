@@ -17,8 +17,8 @@ def load_xl_workbook(path: str) -> Workbook:
     return openpyxl.load_workbook(path)
 
 
-def get_worksheet_values_from_workbook(wookrbook: Workbook, worksheet_name: str) -> GeneratorType:
-    return wookrbook[worksheet_name].values
+def get_worksheet_values_from_workbook(workbook: Workbook, worksheet_name: str) -> GeneratorType:
+    return workbook[worksheet_name].values
 
 
 def copy_sheet_in_same_workbook(workbook_path: str, sheet_to_copy_name: str, name_of_new_sheet: str) -> None:
